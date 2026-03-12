@@ -66,6 +66,17 @@ class RoomInventory implements Serializable {
             System.out.println(type + " : " + inventory.get(type));
         }
     }
+
+    // Getter for inventory map
+    public Map<String, Integer> getInventoryMap() {
+        return inventory;
+    }
+
+    // Restore inventory from another RoomInventory object
+    public void restoreInventory(RoomInventory restored) {
+        this.inventory.clear();
+        this.inventory.putAll(restored.getInventoryMap());
+    }
 }
 
 // Service to persist and recover state
@@ -97,10 +108,10 @@ class PersistenceService {
             RoomInventory restoredInventory = (RoomInventory) in.readObject();
             List<Reservation> restoredBookings = (List<Reservation>) in.readObject();
 
-            // Restore inventory and bookings
-            for (String type : restoredInventory.inventory.keySet()) {
-                inventory.inventory.put(type, restoredInventory.inventory.get(type));
-            }
+            // Restore inventory using method
+            inventory.restoreInventory(restoredInventory);
+
+            // Restore bookings
             bookings = restoredBookings;
             System.out.println("\nSystem state restored successfully.");
         } catch (IOException | ClassNotFoundException e) {
